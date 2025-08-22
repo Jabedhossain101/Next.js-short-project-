@@ -1,11 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { useSession, signOut } from 'next-auth/react';
+import { useAuth } from '../contexts/AuthContext';
 import ThemeToggle from './ThemeToggle';
 
 export default function Header() {
-  const { data: session, status } = useSession();
+  const { user, signOut } = useAuth();
 
   return (
     <header
@@ -43,7 +43,7 @@ export default function Header() {
               <Link href="/products">Products</Link>
             </li>
 
-            {status === 'authenticated' ? (
+            {user ? (
               <>
                 <li>
                   <Link href="/dashboard/add-product">Add Product</Link>

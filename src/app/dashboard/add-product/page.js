@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../../../contexts/AuthContext';
 import Header from '../../../components/Header';
 import Spinner from '../../../components/Spinner';
 import { toast } from 'react-toastify';
@@ -14,14 +14,30 @@ export default function AddProduct() {
   const [image, setImage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const { data: session, status } = useSession();
+  const { user, loading } = useAuth();
   const router = useRouter();
 
-  if (status === 'loading') {
-    return <Spinner />;
+  if (loading) {
+    return (
+      <div>
+        <Header />
+        <div
+          className="container"
+          style={{
+            padding: '2rem 0',
+            minHeight: '70vh',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <Spinner />
+        </div>
+      </div>
+    );
   }
 
-  if (status === 'unauthenticated') {
+  if (!user) {
     router.push('/login');
     return null;
   }
@@ -109,6 +125,7 @@ export default function AddProduct() {
               id="image"
               value={image}
               onChange={e => setImage(e.target.value)}
+              placeholder="https://example.com/image.jpg"
             />
           </div>
 

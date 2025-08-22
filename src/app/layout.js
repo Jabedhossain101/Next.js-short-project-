@@ -1,10 +1,7 @@
-import { Inter } from 'next/font/google';
-import './globals.css';
-import { AuthProvider } from './Providers';
+import { AuthProvider } from '../contexts/AuthContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
-const inter = Inter({ subsets: ['latin'] });
+import './globals.css';
 
 export const metadata = {
   title: 'Product Management App',
@@ -14,7 +11,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body>
         <AuthProvider>
           {children}
           <ToastContainer position="bottom-right" />

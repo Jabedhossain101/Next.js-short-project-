@@ -15,7 +15,7 @@ export default function ProductCard({ product }) {
     >
       <img
         src={product.image || '/placeholder-product.jpg'}
-        alt={product.name}
+        alt={product.name || 'Product image'}
         style={{ width: '100%', height: '200px', objectFit: 'cover' }}
       />
 
@@ -27,12 +27,15 @@ export default function ProductCard({ product }) {
           flexDirection: 'column',
         }}
       >
-        <h3 style={{ marginBottom: '0.5rem' }}>{product.name}</h3>
+        <h3 style={{ marginBottom: '0.5rem' }}>
+          {product.name || 'Unnamed Product'}
+        </h3>
         <p style={{ marginBottom: '1rem', flexGrow: 1 }}>
-          {product.description.substring(0, 100)}...
+          {product.description?.substring(0, 100) || 'No description available'}
+          ...
         </p>
         <p style={{ fontWeight: 'bold', marginBottom: '1rem' }}>
-          ${product.price}
+          ${product.price ?? 'N/A'}
         </p>
 
         <Link

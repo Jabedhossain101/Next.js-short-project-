@@ -1,24 +1,9 @@
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
-import ProductCard from '../../components/ProductCard';
 import Link from 'next/link';
+import ProductList from '../../components/ProductList';
 
-async function getProducts() {
-  // In a real app, you would fetch from your API
-  const res = await fetch(`${process.env.NEXTAUTH_URL}/api/products`, {
-    cache: 'no-store',
-  });
-
-  if (!res.ok) {
-    throw new Error('Failed to fetch products');
-  }
-
-  return res.json();
-}
-
-export default async function Products() {
-  const products = await getProducts();
-
+export default function Products() {
   return (
     <div>
       <Header />
@@ -41,11 +26,7 @@ export default async function Products() {
           </Link>
         </div>
 
-        <div className="products-grid">
-          {products.map(product => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        <ProductList />
       </div>
 
       <Footer />

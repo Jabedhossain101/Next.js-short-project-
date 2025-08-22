@@ -10,7 +10,7 @@ export const authOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        // Demo user - simple authentication
+        // Demo user - in a real app, you would fetch from your database
         if (
           credentials.email === 'admin@example.com' &&
           credentials.password === 'password123'

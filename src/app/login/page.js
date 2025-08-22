@@ -1,32 +1,34 @@
 'use client';
 
-import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../../contexts/AuthContext';
 import Header from '../../components/Header';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
   const router = useRouter();
+  const { signIn } = useAuth();
 
   const handleSubmit = async e => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
 
-    const result = await signIn('credentials', {
-      email,
-      password,
-      redirect: false,
-    });
-
-    setIsLoading(false);
-
-    if (result.ok) {
-      router.push('/products');
-    } else {
-      alert('Login failed');
+    try {
+      const user = await signIn(email, password);
+      if (user) {
+        router.push('/products');
+      } else {
+        setError('Login failed. Please use: admin@example.com / password123');
+      }
+    } catch (err) {
+      setError('An error occurred during login');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -40,6 +42,10 @@ export default function Login() {
         <h1 style={{ textAlign: 'center', marginBottom: '2rem' }}>Login</h1>
 
         <div style={{ maxWidth: '400px', margin: '0 auto' }}>
+          {error && (
+            <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>
+          )}
+
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label htmlFor="email">Email</label>
@@ -72,17 +78,6 @@ export default function Login() {
               {isLoading ? 'Logging in...' : 'Login'}
             </button>
           </form>
-
-          <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-            <p>Or login with:</p>
-            <button
-              onClick={() => signIn('google', { callbackUrl: '/products' })}
-              className="btn btn-secondary"
-              style={{ marginTop: '1rem' }}
-            >
-              Google
-            </button>
-          </div>
 
           <p style={{ textAlign: 'center', marginTop: '2rem' }}>
             Demo credentials: admin@example.com / password123
