@@ -2,50 +2,6 @@
 
 import { createContext, useContext, useState, useEffect } from 'react';
 
-// Simple session management
-let currentUser = null;
-
-export const auth = {
-  signIn: (email, password) => {
-    if (email === 'admin@example.com' && password === 'password123') {
-      currentUser = {
-        id: 1,
-        email: 'admin@example.com',
-        name: 'Admin User',
-      };
-      // Store in localStorage for persistence
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('user', JSON.stringify(currentUser));
-      }
-      return Promise.resolve(currentUser);
-    }
-    return Promise.resolve(null);
-  },
-  signOut: () => {
-    currentUser = null;
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('user');
-    }
-    return Promise.resolve();
-  },
-  getSession: () => {
-    if (currentUser) {
-      return Promise.resolve(currentUser);
-    }
-
-    // Check localStorage for existing session
-    if (typeof window !== 'undefined') {
-      const storedUser = localStorage.getItem('user');
-      if (storedUser) {
-        currentUser = JSON.parse(storedUser);
-        return Promise.resolve(currentUser);
-      }
-    }
-
-    return Promise.resolve(null);
-  },
-};
-
 const AuthContext = createContext({});
 
 export function useAuth() {
@@ -57,21 +13,46 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    auth.getSession().then(user => {
-      setUser(user);
-      setLoading(false);
-    });
+    const storedUser =
+      typeof window !== 'undefined' ? localStorage.getItem('user') : null;
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+    setLoading(false);
   }, []);
 
   const signIn = async (email, password) => {
-    const user = await auth.signIn(email, password);
-    setUser(user);
-    return user;
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setUser(data.user);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('user', JSON.stringify(data.user));
+        }
+        return data.user;
+      } else {
+        throw new Error(data.error || 'Login failed');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
   };
 
   const signOut = async () => {
-    await auth.signOut();
     setUser(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('user');
+    }
   };
 
   const value = {

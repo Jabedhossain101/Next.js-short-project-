@@ -9,5 +9,4 @@ const nextConfig = {
   },
 };
 
-// Use ES module export syntax
 export default nextConfig;
